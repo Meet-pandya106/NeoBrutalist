@@ -188,6 +188,13 @@ export const agency: Preset = {
                 default: 85,
                 unit: '%',
               },
+              {
+                type: 'text',
+                name: 'userApiKey',
+                label: 'Google AI Studio API Key (Optional — leave empty for instant offline engine)',
+                placeholder: 'AIzaSy... (or set GEMINI_API_KEY in .env.local)',
+                fullWidth: true,
+              },
             ],
             tone: 'paper-2',
           },
