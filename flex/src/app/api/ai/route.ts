@@ -2,15 +2,14 @@ import { NextResponse } from 'next/server'
 
 /**
  * GOOGLE AI STUDIO (GEMINI) INTEGRATION
- * Compatible with Google AI Studio free tier keys.
- * Set GEMINI_API_KEY or GOOGLE_API_KEY in .env.local, or pass apiKey in request body.
+ * Connects to Google AI Studio Gemini API for real-time editorial synthesis.
+ * Uses GEMINI_API_KEY from environment or userApiKey from client.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { idea, audience, platform, tone, creativity = 85, userApiKey } = body
 
-    // Priority: user-supplied in request > GEMINI_API_KEY > GOOGLE_API_KEY > AI_API_KEY
     const apiKey =
       userApiKey ||
       process.env.GEMINI_API_KEY ||
@@ -21,76 +20,72 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: false,
         error: 'NO_API_KEY',
-        message: 'No Google AI Studio key configured. Using local synthesis engine.',
+        message: 'No Gemini API key configured. Using local synthesis engine.',
       })
     }
 
-    const systemPrompt = `You are NEOFORGE, an elite AI engine that transforms raw human context and ideas into high-impact, multi-platform content.
-CRITICAL CONSTRAINT: You are NOT a generic ChatGPT wrapper. Do NOT write conversational filler, generic intros like "In today's fast-paced world", or polite pleasantries.
-Generate structured, publish-ready content packets.
+    const systemPrompt = `You are NEOFORGE, an elite editorial AI engine that transforms raw ideas, domain notes, and technical concepts into high-impact, multi-platform publishing assets.
+Never include generic conversational filler (such as "In today's fast-paced world", "Sure, here is your...", or pleasantries). Provide direct, high-signal, publish-ready content.
 
 Target Audience: ${audience || 'Developers & Technical Leads'}
 Target Platform: ${platform || 'Viral X/Twitter Thread'}
 Voice/Tone: ${tone || 'Contrarian Neo-Brutalist'}
-Creativity/Novelty: ${creativity}%
+Voice Intensity: ${creativity}%
 
 Return ONLY a valid JSON object matching this schema:
 {
-  "headline": "SHORT PUNCHY ALL-CAPS HEADLINE",
-  "summary": "1 sentence positioning statement",
-  "antiWrapperQuote": "Why this specific output is structurally superior to a standard ChatGPT text response",
+  "headline": "SHORT ALL-CAPS EDITORIAL HEADLINE",
+  "summary": "1 concise sentence positioning the core thesis",
   "channels": [
     {
       "id": "primary",
       "platform": "${platform || 'Viral X/Twitter Thread'}",
       "format": "Thread Sequence or Structured Markdown",
-      "title": "Bold Title for this channel",
+      "title": "Title for this channel",
       "hook": "Attention-stopping opening hook (1-2 sentences)",
-      "body": "The full, high-substance body text with numbered points and zero fluff",
+      "body": "The full substantive body text with numbered points, clean breaks, and zero fluff",
       "tags": ["#Tag1", "#Tag2", "#Tag3"],
-      "metrics": [{"label": "Hook Impact", "value": "96%"}, {"label": "Platform Fit", "value": "100%"}]
+      "metrics": [{"label": "Hook Velocity", "value": "97%"}, {"label": "Platform Fit", "value": "100%"}]
     },
     {
       "id": "linkedin",
       "platform": "LinkedIn Thought Leadership",
-      "format": "Editorial Narrative",
-      "title": "Compelling professional angle",
+      "format": "Executive Essay",
+      "title": "Professional angle title",
       "hook": "First 2 lines that stop the scroll",
-      "body": "Substantive essay with clear tactical takeaways",
+      "body": "Substantive essay with clear tactical takeaways and a closing discussion question",
       "tags": ["#Tag1", "#Tag2"],
-      "metrics": [{"label": "Receptivity", "value": "94%"}, {"label": "Readability", "value": "High"}]
+      "metrics": [{"label": "Audience Relevance", "value": "98%"}, {"label": "Readability", "value": "High"}]
     },
     {
       "id": "pitch",
-      "platform": "Executive 1-Pager & Demo Hook",
-      "format": "Pitch Slide Thesis",
-      "title": "High-Conviction Value Proposition",
+      "platform": "Executive 1-Pager & Briefing",
+      "format": "Executive Brief",
+      "title": "Strategic Memo Title",
       "hook": "Executive summary thesis in caps",
-      "body": "Problem, Solution, Unfair Advantage, and Hackathon Rubric validation",
-      "tags": ["#50Points", "#HackathonWinner"],
-      "metrics": [{"label": "Conviction", "value": "10/10"}, {"label": "Rubric Score", "value": "50/50"}]
+      "body": "Problem Overview, Strategic Solution, Quantifiable Outcomes, and Next Steps",
+      "tags": ["#ExecutiveBrief", "#Strategy"],
+      "metrics": [{"label": "Strategic Clarity", "value": "10/10"}, {"label": "Actionability", "value": "98%"}]
     }
   ],
-  "rubricScore": {
-    "total": 49,
-    "max": 50,
+  "qualityScore": {
+    "total": 98,
+    "max": 100,
     "items": [
-      {"category": "Problem Understanding", "points": 10, "maxPoints": 10, "feedback": "Solves generic LLM prompt exhaustion"},
-      {"category": "Innovation", "points": 10, "maxPoints": 10, "feedback": "5-pillar context synthesis beyond prompt wrappers"},
-      {"category": "User Interface", "points": 10, "maxPoints": 10, "feedback": "Tactile Neo-brutalist output styling"},
-      {"category": "Functionality", "points": 9, "maxPoints": 10, "feedback": "Multi-channel generation and live scoring"},
-      {"category": "Presentation", "points": 10, "maxPoints": 10, "feedback": "Clear anti-wrapper conviction"}
+      {"category": "Hook Velocity", "score": 10, "maxScore": 10, "note": "High-tension opening with immediate value."},
+      {"category": "Audience Calibration", "score": 10, "maxScore": 10, "note": "Nuance and terminology calibrated for target reader."},
+      {"category": "Platform Fit", "score": 10, "maxScore": 10, "note": "Formatted specifically for channel constraints."},
+      {"category": "Content Density", "score": 9, "maxScore": 10, "note": "High signal-to-noise ratio with zero generic filler."},
+      {"category": "Clarity & Flow", "score": 10, "maxScore": 10, "note": "Crisp transitions and structured proofs."}
     ]
   },
   "suggestions": [
-    "One-click copy any channel to clipboard",
-    "Calibrated for target audience psychographics",
-    "Zero generic AI clichés detected"
+    "One-click copy any channel to your clipboard",
+    "Calibrated specifically for target audience",
+    "Ready for instant deployment"
   ]
 }`
 
-    // Call Google AI Studio Gemini API endpoint
-    // Using gemini-2.0-flash with fallback to gemini-1.5-flash
     const model = 'gemini-2.0-flash'
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
 
@@ -103,7 +98,7 @@ Return ONLY a valid JSON object matching this schema:
             role: 'user',
             parts: [
               {
-                text: `${systemPrompt}\n\nRAW USER IDEA/CONTEXT:\n"""${idea}"""`,
+                text: `${systemPrompt}\n\nRAW CONCEPT / DOMAIN NOTES:\n"""${idea}"""`,
               },
             ],
           },
@@ -117,12 +112,12 @@ Return ONLY a valid JSON object matching this schema:
 
     if (!geminiRes.ok) {
       const errText = await geminiRes.text()
-      console.warn(`[Google AI Studio Gemini API Error ${geminiRes.status}]:`, errText)
+      console.warn(`[Gemini API Status ${geminiRes.status}]:`, errText)
       return NextResponse.json({
         success: false,
         error: 'API_ERROR',
         status: geminiRes.status,
-        message: `Gemini API returned status ${geminiRes.status}. Falling back to local engine.`,
+        message: `Gemini API returned ${geminiRes.status}. Using local synthesis engine.`,
       })
     }
 
@@ -133,7 +128,7 @@ Return ONLY a valid JSON object matching this schema:
       return NextResponse.json({
         success: false,
         error: 'EMPTY_RESPONSE',
-        message: 'No text returned from Gemini. Falling back to local engine.',
+        message: 'No response from Gemini. Using local synthesis engine.',
       })
     }
 
@@ -148,7 +143,7 @@ Return ONLY a valid JSON object matching this schema:
     return NextResponse.json({
       success: false,
       error: 'SERVER_EXCEPTION',
-      message: err?.message || 'Unknown error calling Gemini API',
+      message: err?.message || 'Error executing Gemini API',
     })
   }
 }
