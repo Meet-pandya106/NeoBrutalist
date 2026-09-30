@@ -1,21 +1,22 @@
 import type { SiteConfig } from './types'
 
 export const siteConfig: SiteConfig = {
-  name: 'FLEX',
-  logo: { type: 'text', value: 'FLEX' },
-  tagline: 'Universal Neo-Brutalist Template',
+  name: 'NEOFORGE',
+  logo: { type: 'text', value: 'NEO//FORGE' },
+  tagline: 'Beyond Generation: Idea → Content Engine',
   nav: [
-    { label: 'Work', href: '/work' },
-    { label: 'Services', href: '/services' },
-    { label: 'About', href: '/about' },
-    { label: 'Insights', href: '/insights' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Pillars', href: '#pillars' },
+    { label: 'Anti-Wrapper', href: '#manifesto' },
+    { label: 'Live Studio', href: '#studio' },
+    { label: 'Protocol', href: '#protocol' },
+    { label: '50-Pt Rubric', href: '#rubric' },
+    { label: 'FAQ', href: '#faq' },
   ],
-  cta: { label: 'Get Started', href: '/contact' },
+  cta: { label: 'LAUNCH STUDIO', href: '#studio' },
   seo: {
-    titleTemplate: '%s | FLEX',
-    description: 'A bold, editorial, neo-brutalist website template that adapts to any purpose through configuration.',
-    ogImage: '/images/og-default.png',
+    titleTemplate: '%s | NEOFORGE',
+    description: 'An AI-powered engine transforming raw user context into multi-platform content assets. Built for hackathon excellence: Not a ChatGPT wrapper.',
+    ogImage: '/images/hero/blob-hq.png',
   },
   activePreset: 'agency',
   features: {

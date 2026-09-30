@@ -7,7 +7,7 @@ import { Container } from '@/components/layout/container';
 import { useTool } from '@/lib/hooks';
 
 export interface ToolField {
-  type: 'slider' | 'select' | 'number' | 'text' | 'switch' | 'segmented';
+  type: 'slider' | 'select' | 'number' | 'text' | 'switch' | 'segmented' | 'textarea';
   name: string;
   label: string;
   min?: number;
@@ -17,11 +17,13 @@ export interface ToolField {
   default?: any;
   placeholder?: string;
   unit?: string;
+  fullWidth?: boolean;
 }
 
 export interface ToolPanelProps {
   title: string;
   subtitle?: string;
+  buttonText?: string;
   fields: ToolField[];
   layout?: 'inline-hero' | 'two-column' | 'stepper';
   id?: string;
@@ -32,7 +34,7 @@ export interface ToolPanelProps {
 /**
  * Schema-driven Tool Panel section component
  */
-export function ToolPanel({ title, subtitle, fields, layout = 'two-column', id, tone = 'paper', className }: ToolPanelProps) {
+export function ToolPanel({ title, subtitle, buttonText, fields, layout = 'two-column', id, tone = 'paper', className }: ToolPanelProps) {
   const { state, run } = useTool();
   
   const [formData, setFormData] = useState<Record<string, any>>(() => {
@@ -63,7 +65,10 @@ export function ToolPanel({ title, subtitle, fields, layout = 'two-column', id, 
         <form onSubmit={handleSubmit} className="space-y-8 bg-paper-2 p-6 md:p-8 border-4 border-ink shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {fields.map((field) => (
-              <div key={field.name} className="space-y-2">
+              <div 
+                key={field.name} 
+                className={cn('space-y-2', (field.fullWidth || field.type === 'textarea') && 'md:col-span-2')}
+              >
                 <label className="block text-sm font-bold uppercase">{field.label}</label>
                 
                 {field.type === 'text' && (
@@ -73,6 +78,16 @@ export function ToolPanel({ title, subtitle, fields, layout = 'two-column', id, 
                     onChange={(e) => handleChange(field.name, e.target.value)}
                     placeholder={field.placeholder}
                     className="w-full bg-paper border-2 border-ink p-3 font-medium focus:outline-none focus:ring-2 focus:ring-accent"
+                  />
+                )}
+
+                {field.type === 'textarea' && (
+                  <textarea
+                    rows={4}
+                    value={formData[field.name]}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    placeholder={field.placeholder}
+                    className="w-full bg-paper border-2 border-ink p-3 font-medium focus:outline-none focus:ring-2 focus:ring-accent resize-y"
                   />
                 )}
 
@@ -161,9 +176,9 @@ export function ToolPanel({ title, subtitle, fields, layout = 'two-column', id, 
           <button 
             type="submit" 
             disabled={state === 'loading'}
-            className="w-full bg-accent text-accent-ink py-4 font-bold uppercase text-lg border-2 border-ink hover:bg-opacity-90 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-70"
+            className="w-full bg-accent text-accent-ink py-4 font-bold uppercase text-lg border-2 border-ink hover:bg-opacity-90 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-70 cursor-pointer"
           >
-            {state === 'loading' ? 'Processing...' : 'Run Tool'}
+            {state === 'loading' ? '⚡ SYNTHESIZING IDEA → CONTENT...' : (buttonText || 'TRANSFORM IDEA → CONTENT')}
           </button>
         </form>
       </Container>
